@@ -1,0 +1,43 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springsecuritydemo2.dao.BookMapper">
+    <resultMap id="bookMap" type="book">
+        <id column="b_bookId" property="bookId" />
+        <result column="b_bookName" property="bookName"/>
+        <result column="b_userId" property="userId"/>
+    </resultMap>
+    <!--查询所有数据-->
+    <select id="selectBookByUserId" resultMap="bookMap">
+        select b_bookName,b_bookId,b_userId from books
+    </select>
+
+    <insert id="insertBook" >
+        insert into books (bookName,userID)values (#{bookName},#{userId})
+    </insert>
+
+    <select id="selectByUserId" resultType="Book" parameterType="java.lang.Integer">
+		select u.* from Books u where userId= #{userId}
+	</select>
+
+    <select id="selectByBookName" resultType="Book" parameterType="String">
+		select u.* from Books u where bookname= #{userName}
+	</select>
+
+    <delete id="deleteByBookName" parameterType="String" >
+        delete from Books
+        where bookName = #{bookName}
+    </delete>
+
+    <!--<select id="selectByPage" resultType="List">-->
+        <!--SELECT * FROM books WHERE userId = #{userId} limit #{page},10-->
+    <!--</select>-->
+
+    <!--&lt;!&ndash;<select id="selectBookByUserId" resultType="SysUser">&ndash;&gt;-->
+        <!--&lt;!&ndash;SELECT * FROM books WHERE userId = #{userId} limit #{page},#{pagenum}&ndash;&gt;-->
+    <!--&lt;!&ndash;</select>&ndash;&gt;-->
+
+    <!--<select id="selectBook" resultType="List" >-->
+        <!--SELECT * FROM books WHERE userId = #{userId}-->
+    <!--</select>-->
+</mapper>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>helloworld</title>
+</head>
+<body>
+<%--增删个人书籍--%>
+<div>
+    <label class="input-tips" for="bookname">书名：</label>
+    <input type="text" id="bookname"/>
+    <span id="bookname_error" style="color: red"></span>
+    <div>
+        <input id="book_form" type="button" value="添加" class="button_blue" onclick="addbook()"/>
+        <input id="book2_form" type="button" value="删除" class="button_blue" onclick="deletebook()"/>
+    </div>
+
+</div>
+<h3>书架</h3>
+<div class="books-center">
+    <div class="books-table">
+        <table class="table table-hover table-striped table-bordered table-sm">
+            <thead>
+            <tr>
+                <td>书籍名称</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr id="book-msg">
+                <div id="course_books" class="course_books">
+                    <div class="book-name">
+
+                    </div>
+                </div>
+            </tr>
+            </tbody>
+        </table>
+        <input id="addpage" type="button" value="下一页" style="width:50px;" class="button_blue" onclick="addpage()"/>
+        <input id="subpage" type="button" value="上一页" style="width:50px;" class="button_blue" onclick="subpage()"/>
+        <a th:href="@{/logout}"><input type="button" value="注销"/></a></div>
+    </div>
+</div>
+
+
+<script type="text/javascript" src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+<script type="text/javascript">
+    $(function () {
+        var page = 0;
+        var paged = page;
+        localStorage.paged = paged;
+        var flag = true;
+        if (page < 0) {
+            flag = false;
+        }
+        // var userId = localStorage.getItem("id");
+        if (flag) {
+            $.ajax({
+                url: 'http://localhost:8080/showpage',
+                type: "get",
+                dataType: 'json',
+                xhrFields: {withCredentials: true},
+                crossDomain: true,
+                cache: false,
+                async: false,
+                data: {"page": page},
+                success: function (result) {
+                    $(".book-name li").remove();
+                    var books = result.data;
+                    for (var i = 0; i < books.length; i++) {
+                        var book = books[i];
+                        var Str = '<li  id="book-name">' + book.bookName + '</li >';
+                        $(".book-name").append(Str);
+                    }
+
+                },
+                error: function () {
+                    alert("显示失败x");
+                }
+            });
+        }
+    })
+
+    function addpage() {
+        var page = localStorage.getItem("paged");
+        page = Number(page) + 1;
+        var paged = page;
+        localStorage.paged = paged;
+        var flag = true;
+        if (page < 0) {
+            flag = false;
+        }
+        var userId = localStorage.getItem("userId");
+        if (flag) {
+            $.ajax({
+                url: "http://localhost:8080/showpage",
+                type: "get",
+                data: {"page": page},
+                dataType: "json",
+                success: function (result) {
+                    if (result.data == null) {
+                        $(".book-name li").remove();
+                        var Str = '<li  id="book-name">' + result.msg + '</li >';
+                        $(".book-name").append(Str);
+                        page = localStorage.getItem("paged") - 1;
+                        paged = page;
+                        localStorage.paged = paged;
+                    } else {
+                        $(".book-name li").remove();
+                        var books = result.data;
+                        for (var i = 0; i < books.length; i++) {
+                            var book = books[i];
+                            var Str = '<li  id="book-name">' + book.bookName + '</li >';
+                            $(".book-name").append(Str);
+                        }
+                    }
+                },
+                error: function () {
+                    alert("显示失败x");
+                }
+            });
+        }
+    }
+
+    function subpage() {
+        var page = localStorage.getItem("paged") - 1;
+        var paged = page;
+        localStorage.paged = paged;
+        var flag = true;
+        if (page < 0) {
+            flag = false;
+            page = localStorage.getItem("paged");
+            page = Number(page) + 1;
+            paged = page;
+            localStorage.paged = paged;
+        }
+        var userId = localStorage.getItem("userId");
+        if (flag) {
+            $.ajax({
+                url: "http://localhost:8080/showpage",
+                type: "get",
+                data: {"page": page},
+                dataType: "json",
+                success: function (result) {
+                    if (result.data == null || result.data == "") {
+                        $(".book-name li").remove();
+                        var Str = '<li  id="book-name">' + result.msg + '</li >';
+                        $(".book-name").append(Str);
+                    } else {
+                        $(".book-name li").remove();
+                        var books = result.data;
+                        for (var i = 0; i < books.length; i++) {
+                            var book = books[i];
+                            var Str = '<li  id="book-name">' + book.bookName + '</li >';
+                            $(".book-name").append(Str);
+                        }
+                    }
+                },
+                error: function () {
+                    alert("显示失败x");
+                }
+            });
+        }
+    }
+
+    function addbook() {
+        //获取书籍名称
+        var bookname = $("#bookname").val();
+        // var userId = localStorage.getItem("userId");
+        // var userName = localStorage.getItem("userName");
+        //    判断书名
+        var flag = true;
+        if (bookname == "") {
+            $("#bookname_error").html("书名不为空");
+            flag = false;
+        }
+        //    发送ajax请求
+        if (flag) {
+            $.ajax({
+                url: "http://localhost:8080/addbook",
+                type: "get",
+                data: {"bookName": bookname},
+                dataType: "json",
+                success: function (result) {
+                    if (result.success) {
+                        alert(result.msg);
+                        $("#bookname").val("");
+                    }
+                    if (result.success) {
+                        alert(result.msg);
+                        window.parent.location.reload();
+                    }
+                },
+                error: function () {
+                    alert("添加失败x");
+                }
+            });
+        }
+    }
+
+    function deletebook() {
+        //获取书籍名称
+        var bookname = $("#bookname").val();
+        // var userId = localStorage.getItem("userId");
+        // var userName = localStorage.getItem("userName");
+        //    判断书名
+        var flag = true;
+        if (bookname == "") {
+            $("#bookname_error").html("书名不为空");
+            flag = false;
+        }
+        //    发送ajax请求
+        if (flag) {
+            $.ajax({
+                url: "http://localhost:8080/deletebook",
+                type: "get",
+                data: {"bookName": bookname},
+                dataType: "json",
+                success: function (result) {
+                    if (result.success) {
+                        alert(result.msg);
+                        $("#bookname").val("");
+                    }
+                    if (result.success) {
+                        alert(result.msg);
+                        window.parent.location.reload();
+                    }
+                },
+                error: function () {
+                    alert("删除失败x");
+                }
+            });
+        }
+    }
+</script>
+</body>
+</html>

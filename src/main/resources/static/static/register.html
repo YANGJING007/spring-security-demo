@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>this is a register page</title>
+</head>
+<body>
+<div>
+    <div><label> 用户名 : <input type="text" id="username"/> </label></div>
+    <div><label> 密 码 : <input type="password" id="password"/> </label></div>
+    <div><label> 确 认 密 码 : <input type="password" id="password2"/> </label><span id="error01"
+                                                                                 style="color: red"></span></div>
+
+    <div><span id="error02" style="color: red"></span><input type="button" value="注册" onclick="register()"/>
+        <a th:href="@{/login}"><input type="button" value="登录"/></a></div>
+</div>
+<script type="text/javascript" src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+<script type="text/javascript">
+    function register() {
+        //清空前一次操作的提示
+        $("#error01").html("");
+        $("#error02").html("");
+        //获取用户输入内容
+        var username = $("#username").val();
+        var password = $("#password").val();
+        var password2 = $("#password2").val();
+        //判断
+        var flag = true;
+        if (password != password2) {
+            $("#error01").html("两次密码输入不一致");
+            flag = false;
+        }
+        if (flag) {
+            $.ajax({
+                url: "http://localhost:8080/register",
+                type: "get",
+                data: {"username": username, "password": password},
+                dataType: "json",
+                success: function (result) {
+                    if (result.success) {//失败
+                        $("#error02").html(result.msg);
+                    }
+                    //成功
+                    if (result.success) {
+                        $("#error02").html(result.msg);
+                        window.parent.location.reload();
+                    }
+                },
+                error: function () {
+                    alert("注册失败x");
+                }
+
+            });
+        }
+    }
+
+</script>
+
+</body>
+</html>
